@@ -32,34 +32,61 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-	// API token check
+		// API token check
 	$('a.provjera').on('click', function(e) {
 		e.preventDefault();
-		var b = $(this), token = $('#token').val();
+		var $btn = $(this);
+		var token = $('#token').val() || '';
+		var nonce = (typeof ajax_object !== 'undefined' && ajax_object.nonce) ? ajax_object.nonce : '';
+
 		$.ajax({
 			type: 'GET',
 			url: ajax_object.ajax_url,
-			data: {action: 'check_token', token: token},
+			data: {action: 'check_token', token: token, nonce: nonce},
 			dataType: 'json',
 			beforeSend: function() {
-				b.hide().after('<div class="spinner is-active"></div>');
-			},
-			error: function(xhr) {
-				$('.spinner').remove().after(xhr.responseText);
-			},
-			success: function(response) {
-				$('.spinner').remove();
-				if (response.status==0) {
-					b.before('Ispravan API token za korisnika <b>' + response.licenca.korisnik + '</b>');
-					if (response.licenca.racuni>3) {
-						b.before('<br>Plaćena licenca traje do ' + response.licenca.datum_isteka);
-					} else {
-						b.before('<br>Koristiš besplatni paket (ograničenje na 3 računa i ponude).');
-					}
-				} else {
-					b.before(response.message);
-				}
+				$btn.hide().after('<div class="spinner is-active"></div>');
 			}
+		})
+		.done(function(response) {
+			$('.spinner').remove();
+			$btn.prevAll('.solo-token-msg').remove();
+
+			if (response && response.status === 0 && response.licenca) {
+				var user = response.licenca.korisnik || '';
+				var $msg = $('<span class="solo-token-msg"></span>');
+				$msg.append(document.createTextNode('Ispravan API token za korisnika '));
+				$msg.append($('<b></b>').text(user));
+				$btn.before($msg);
+
+				var racuni = parseInt(response.licenca.racuni, 10) || 0;
+				if (racuni > 3) {
+					var exp = response.licenca.datum_isteka || '';
+					$btn.before($('<span class="solo-token-msg"></span>').append('<br>').append(document.createTextNode('Plaćena licenca traje do ' + exp)));
+				} else {
+					$btn.before($('<span class="solo-token-msg"></span>').append('<br>').append(document.createTextNode('Koristiš besplatni paket (ograničenje na 3 računa i ponude).')));
+				}
+			} else if (response && response.message) {
+				$btn.before($('<span class="solo-token-msg"></span>').text(response.message));
+			} else {
+				$btn.before($('<span class="solo-token-msg"></span>').text('Neispravan odgovor servisa.'));
+			}
+		})
+		.fail(function(xhr) {
+			$('.spinner').remove();
+			var msg = 'Došlo je do greške pri provjeri tokena.';
+			if (xhr && xhr.responseText) {
+				try {
+					var json = JSON.parse(xhr.responseText);
+					if (json && json.data && json.data.message) {
+						msg = json.data.message;
+					}
+				} catch (e) {}
+			}
+			$btn.before($('<span class="solo-token-msg"></span>').text(msg));
+		})
+		.always(function() {
+			$btn.show();
 		});
 	});
 
