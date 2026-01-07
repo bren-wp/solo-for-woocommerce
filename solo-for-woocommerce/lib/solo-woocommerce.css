@@ -1,13 +1,155 @@
-.form-table th label {position:relative; display:block;}
-div.solo-logo {display:inline-block; vertical-align:-50%; margin-right:10px; width:52px; height:52px; background:url(solo-for-woocommerce.png); background-size:cover; border-radius:3px;}
-sup.tooltip {position:absolute; right:0; top:25%; width:13px; height:13px; line-height:12px; vertical-align:0; cursor:help;}
-sup.tooltip:after {content:'?'; position:absolute; top:0; left:0; width:100%; height:100%; color:#fff; background:#666; border-radius:50%; font-weight:600; text-align:center; font-size:10px;}
-.jBox-container {padding:12px; font-size:11px; background:#333; color:#fff; border-radius:4px; max-width:200px; line-height:1.3;}
-.spinner {float:none;}
-table#arhiva thead th {overflow:hidden; text-overflow:ellipsis;}
-table#arhiva tbody tr.shrink p {position:relative; height:75px; overflow:hidden; cursor:pointer;}
-.fancySearchRow input[type=search] {padding:0 8px;}
-span.status {padding:3px 6px; border-radius:4px;}
-span.status.processing {background:#c6e1c6; color:#5b841b;}
-span.status.on-hold {background:#f8dda7; color:#94660c;}
-span.status.completed {background:#c8d7e1; color:#2e4453;}
+/* -----------------------------
+   Form / layout helpers
+------------------------------ */
+
+.form-table th > label {
+  position: relative;
+  display: block;
+}
+
+/* Logo */
+div.solo-logo {
+  display: inline-block;
+  vertical-align: middle;          /* stabilnije od negativnih postotaka */
+  margin-right: 10px;
+  width: 52px;
+  height: 52px;
+
+  background-image: url("solo-for-woocommerce.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border-radius: 3px;
+}
+
+/* -----------------------------
+   Tooltip (? icon)
+------------------------------ */
+
+sup.tooltip {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+
+  cursor: help;
+  user-select: none;
+}
+
+sup.tooltip::after {
+  content: "?";
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+  background: #666;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* -----------------------------
+   jBox tooltip container
+------------------------------ */
+
+.jBox-container {
+  padding: 12px;
+  max-width: 200px;
+
+  font-size: 11px;
+  line-height: 1.35;
+  color: #fff;
+  background: #333;
+
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* -----------------------------
+   WordPress spinner tweaks
+------------------------------ */
+
+.spinner {
+  float: none;
+  margin: 0; /* WP spinner često ima margin-left; ovo ga “smiri” */
+}
+
+/* -----------------------------
+   Archive table
+------------------------------ */
+
+/* Ellipsis radi samo ako postoji overflow + nowrap + neka širina */
+table#arhiva thead th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* “Shrink” tekst: moderniji clamp (i dalje radi kao “skraćeno”) */
+table#arhiva tbody tr.shrink p {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+
+  /* zadrži približno visinu iz originala */
+  max-height: 75px;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; /* prilagodi po želji */
+}
+
+/* Ako ikad dodaš klasu za proširen prikaz */
+table#arhiva tbody tr.shrink p.is-expanded {
+  max-height: none;
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+/* -----------------------------
+   Search input
+------------------------------ */
+
+.fancySearchRow input[type="search"] {
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+/* -----------------------------
+   Status badges
+------------------------------ */
+
+span.status {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+span.status.processing {
+  background: #c6e1c6;
+  color: #2f5d0a; /* malo bolji kontrast */
+}
+
+span.status.on-hold {
+  background: #f8dda7;
+  color: #7a4f00; /* malo bolji kontrast */
+}
+
+span.status.completed {
+  background: #c8d7e1;
+  color: #1f3647; /* malo bolji kontrast */
+}
